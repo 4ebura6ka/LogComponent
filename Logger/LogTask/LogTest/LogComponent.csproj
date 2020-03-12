@@ -43,6 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncLog.cs" />
+    <Compile Include="DateTimeProvider.cs" />
+    <Compile Include="IDateTimeProvider.cs" />
     <Compile Include="ILog.cs" />
     <Compile Include="LogLine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

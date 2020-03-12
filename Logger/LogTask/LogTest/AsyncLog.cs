@@ -20,7 +20,7 @@
             if (!Directory.Exists(@"C:\LogTest")) 
                 Directory.CreateDirectory(@"C:\LogTest");
 
-            this._writer = File.AppendText(@"C:\LogTest\Log" + DateTime.Now.ToString("yyyyMMdd HHmmss fff") + ".log");
+            this._writer = File.AppendText(@"C:\LogTest\Log" + DateTimeProvider.Current.DateTimeNow.ToString("yyyyMMdd HHmmss fff") + ".log");
             
             this._writer.Write("Timestamp".PadRight(25, ' ') + "\t" + "Data".PadRight(15, ' ') + "\t" + Environment.NewLine);
 
@@ -33,7 +33,7 @@
         private bool _QuitWithFlush = false;
 
 
-        DateTime _curDate = DateTime.Now;
+        DateTime _curDate = DateTimeProvider.Current.DateTimeNow;
 
         private void MainLoop()
         {
@@ -57,11 +57,11 @@
 
                             StringBuilder stringBuilder = new StringBuilder();
 
-                            if ((DateTime.Now - _curDate).Days != 0)
+                            if ((DateTimeProvider.Current.DateTimeNow - _curDate).Days != 0)
                             {
-                                _curDate = DateTime.Now;
+                                _curDate = DateTimeProvider.Current.DateTimeNow;
 
-                                this._writer = File.AppendText(@"C:\LogTest\Log" + DateTime.Now.ToString("yyyyMMdd HHmmss fff") + ".log");
+                                this._writer = File.AppendText(@"C:\LogTest\Log" + DateTimeProvider.Current.DateTimeNow.ToString("yyyyMMdd HHmmss fff") + ".log");
 
                                 this._writer.Write("Timestamp".PadRight(25, ' ') + "\t" + "Data".PadRight(15, ' ') + "\t" + Environment.NewLine);
 
@@ -108,7 +108,7 @@
 
         public void Write(string text)
         {
-            this._lines.Add(new LogLine() { Text = text, Timestamp = DateTime.Now });
+            this._lines.Add(new LogLine() { Text = text, Timestamp = DateTimeProvider.Current.DateTimeNow });
         }
     }
 }
