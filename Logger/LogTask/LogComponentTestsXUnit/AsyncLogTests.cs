@@ -21,10 +21,8 @@ namespace LogComponentTestsXUnit
         {
             var log = new AsyncLog();
 
-            log.Write(demoText);
-            Thread.Sleep(50);
-
-            log.StopWithoutFlush();
+            log.Write(demoText); 
+            log.StopWithFlush();
 
             Assert.True(Directory.Exists(logDir));
 
