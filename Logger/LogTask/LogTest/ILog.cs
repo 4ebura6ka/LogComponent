@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-
-namespace LogTest
+﻿namespace LogTest
 {
     public interface ILog
     {
@@ -11,7 +8,7 @@ namespace LogTest
         void StopWithoutFlush();
 
         /// <summary>
-        /// Stop the logging. The call will not return until all all logs have been written to Log.
+        /// Stop the logging. The call will not return until all logs have been written to Log.
         /// </summary>
         void StopWithFlush();
 
@@ -20,7 +17,5 @@ namespace LogTest
         /// </summary>
         /// <param name="text">The text to written to the log</param>
         void Write(string text);
-
-
     }
 }
