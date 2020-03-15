@@ -1,20 +1,18 @@
-﻿using LogTest;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Moq;
-using Xunit;
-
-namespace LogComponentTestsXUnit
+﻿namespace LogComponentTestsXUnit
 {
+    using LogTest;
+    using System;
+    using System.IO;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Moq;
+    using Xunit;
+
     public class AsyncLogTests
     {
-        private const string logDir = @"C:\LogTest\";
-        private string demoText = DateTime.Now.ToLongTimeString();
+        private const string LogDir = @"C:\LogTest\";
+        private readonly string _demoText = DateTime.Now.ToLongTimeString();
 
         [Fact]
         public async Task WriteToLogFile()
@@ -27,13 +25,13 @@ namespace LogComponentTestsXUnit
 
             var log = new AsyncLog();
 
-            log.Write(demoText);
+            log.Write(_demoText);
             Thread.Sleep(50);
             log.StopWithFlush();
 
-            Assert.True(Directory.Exists(logDir));
+            Assert.True(Directory.Exists(LogDir));
 
-            var files = Directory.GetFiles(logDir);
+            var files = Directory.GetFiles(LogDir);
             var dateFormatted = dateTime.ToString("yyyyMMdd HHmmss fff");
 
             foreach (var file in files)
@@ -45,7 +43,7 @@ namespace LogComponentTestsXUnit
                     using (StreamReader streamReader = File.OpenText(file))
                     {
                         var fileContent = await streamReader.ReadToEndAsync();
-                        Assert.Contains(fileContent, demoText);
+                        Assert.Contains(fileContent, _demoText);
                     }
                 }
             }
@@ -60,20 +58,21 @@ namespace LogComponentTestsXUnit
             DateTimeProvider.Current = timeMock.Object;
 
             var log = new AsyncLog();
-            log.Write(demoText);
-            Thread.Sleep(50);
+            log.Write(_demoText);
+            Thread.Sleep(70);
 
-            Assert.True(Directory.Exists(logDir));
+            Assert.True(Directory.Exists(LogDir));
 
-            var files = Directory.GetFiles(logDir);
+            var files = Directory.GetFiles(LogDir);
 
             int numberOfFilesBeforeMidnight = files.Count();
 
             timeMock.SetupGet(x => x.DateTimeNow).Returns(new DateTime(2020, 3, 13, 00, 01, 00));
-            log.Write(demoText);
-            Thread.Sleep(50);
+            log.Write(_demoText);
 
-            int numberOfFilesAfterMidnight = Directory.GetFiles(logDir).Count();
+            Thread.Sleep(70);
+
+            int numberOfFilesAfterMidnight = Directory.GetFiles(LogDir).Count();
 
             Assert.True(numberOfFilesBeforeMidnight < numberOfFilesAfterMidnight);
         }
@@ -88,12 +87,12 @@ namespace LogComponentTestsXUnit
             DateTimeProvider.Current = dateTimeProviderMock.Object;
 
             var log = new AsyncLog();
-            log.Write(demoText);
+            log.Write(_demoText);
             Thread.Sleep(50);
             log.StopWithoutFlush();
 
-            Assert.True(Directory.Exists(logDir));
-            var files = Directory.GetFiles(logDir);
+            Assert.True(Directory.Exists(LogDir));
+            var files = Directory.GetFiles(LogDir);
 
             var formattedDate = dateTime.ToString("yyyyMMdd HHmmss fff");
 
@@ -105,7 +104,7 @@ namespace LogComponentTestsXUnit
                     using (var streamReader = File.OpenText(file))
                     {
                         var content = await streamReader.ReadToEndAsync();
-                        Assert.DoesNotContain(demoText, content);
+                        Assert.DoesNotContain(_demoText, content);
                     }
                     break;
                 }
@@ -122,13 +121,13 @@ namespace LogComponentTestsXUnit
             DateTimeProvider.Current = dateTimeProviderMock.Object;
 
             var log = new AsyncLog();
-            log.Write(demoText);
+            log.Write(_demoText);
             Thread.Sleep(50);
             log.StopWithFlush();
 
-            Assert.True(Directory.Exists(logDir));
+            Assert.True(Directory.Exists(LogDir));
 
-            var files = Directory.GetFiles(logDir);
+            var files = Directory.GetFiles(LogDir);
             var formattedDate = dateTime.ToString("yyyyMMdd HHmmss fff");
             foreach (var file in files)
             {
@@ -138,7 +137,7 @@ namespace LogComponentTestsXUnit
                     using (StreamReader fileReader = File.OpenText(file))
                     {
                         var fileContent = await fileReader.ReadToEndAsync();
-                        Assert.Contains(fileContent, demoText);
+                        Assert.Contains(fileContent, _demoText);
                     }
                     break;
                 }
