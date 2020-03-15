@@ -14,9 +14,11 @@ namespace LogTest
     {
         private const string DefaultLogPath = @"C:\LogTest";
 
-        private BlockingCollection<LogLine> _lines = new BlockingCollection<LogLine>();
+        private readonly string _logPath;
 
-        private StreamWriter _writer;
+        private string _logFullPath;
+
+        private BlockingCollection<LogLine> _lines = new BlockingCollection<LogLine>();
 
         private bool _exit;
 
@@ -30,6 +32,8 @@ namespace LogTest
             {
                 Directory.CreateDirectory(logPath);
             }
+
+            _logPath = logPath;
 
             CreateLogFile();
 
@@ -49,18 +53,21 @@ namespace LogTest
 
             var logTimeStamp = _lastLogFileCreationDateTime.ToString("yyyyMMdd HHmmss fff");
             var logFileName = $"Log{logTimeStamp}.log";
-            _writer = File.AppendText(@"C:\LogTest\" + logFileName);
+            _logFullPath = Path.Combine(_logPath, logFileName);
 
-            var captionStringBuilder = new StringBuilder();
-            captionStringBuilder.Append("Timestamp".PadRight(25, ' '));
-            captionStringBuilder.Append("\t");
-            captionStringBuilder.Append("Data".PadRight(15, ' '));
-            captionStringBuilder.Append("\t");
-            captionStringBuilder.Append(Environment.NewLine);
+            using (var writer = File.AppendText(_logFullPath))
+            {
+                var captionStringBuilder = new StringBuilder();
+                captionStringBuilder.Append("Timestamp".PadRight(25, ' '));
+                captionStringBuilder.Append("\t");
+                captionStringBuilder.Append("Data".PadRight(15, ' '));
+                captionStringBuilder.Append("\t");
+                captionStringBuilder.Append(Environment.NewLine);
 
-            _writer.Write(captionStringBuilder.ToString());
+                writer.Write(captionStringBuilder.ToString());
 
-            _writer.AutoFlush = true;
+                writer.AutoFlush = true;
+            }
         }
 
         private void MainLoop()
@@ -80,7 +87,6 @@ namespace LogTest
 
                 Thread.Sleep(50);
             }
-            _writer.Dispose();
         }
 
         private void WriteFormattedLineToLog(LogLine logLine)
@@ -104,7 +110,10 @@ namespace LogTest
 
             stringBuilder.Append(Environment.NewLine);
 
-            _writer.Write(stringBuilder.ToString());
+            using (var writer = File.AppendText(_logFullPath))
+            {
+                writer.Write(stringBuilder.ToString());
+            }
         }
 
         public void StopWithoutFlush()
