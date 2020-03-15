@@ -95,10 +95,11 @@
 
             var log = new AsyncLog();
             log.Write(_demoText);
-            for (var i = 0; i <= 100; i++)
+            var loopCounter = 5;
+            for (var i = 0; i <= loopCounter; i++)
             {
                 log.Write($"{_demoText}{i}");
-                Thread.Sleep(50);
+                Thread.Sleep(40);
             }
             log.StopWithoutFlush();
 
@@ -115,7 +116,7 @@
                     using (var streamReader = File.OpenText(file))
                     {
                         var content = await streamReader.ReadToEndAsync();
-                        Assert.False(_demoText.Contains(content));
+                        Assert.False(_demoText.Contains($"{_demoText}{loopCounter}"));
                     }
                     break;
                 }
@@ -131,12 +132,12 @@
             DateTimeProvider.Current = dateTimeProviderMock.Object;
 
             var log = new AsyncLog();
-            for (var i = 0; i <= 100; i++)
+            var loopCounter = 5;
+            for (var i = 0; i <= loopCounter; i++)
             {
                 log.Write($"{_demoText}{i}");
-                Thread.Sleep(50);
+                Thread.Sleep(40);
             }
-
             log.StopWithFlush();
 
             Assert.True(Directory.Exists(LogDir));
@@ -151,7 +152,7 @@
                     using (StreamReader fileReader = File.OpenText(file))
                     {
                         var fileContent = await fileReader.ReadToEndAsync();
-                        Assert.True(fileContent.Contains($"{_demoText}101"));
+                        Assert.True(fileContent.Contains($"{_demoText}{loopCounter}"));
                     }
                     break;
                 }
