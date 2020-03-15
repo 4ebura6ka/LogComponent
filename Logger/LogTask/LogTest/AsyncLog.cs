@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Collections.Concurrent;
+using System.Threading;
 
 namespace LogTest
 {
@@ -6,13 +7,14 @@ namespace LogTest
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
-    using System.Threading;
+    using System.Threading.Tasks;
+
 
     public class AsyncLog : ILog
     {
         private const string DefaultLogPath = @"C:\LogTest";
 
-        private List<LogLine> _lines = new List<LogLine>();
+        private BlockingCollection<LogLine> _lines = new BlockingCollection<LogLine>();
 
         private StreamWriter _writer;
 
@@ -31,9 +33,14 @@ namespace LogTest
 
             CreateLogFile();
 
-            var _runThread = new Thread(MainLoop);
-
-            _runThread.Start();
+            try
+            {
+                Task.Run(() => MainLoop());
+            }
+            catch (AggregateException e)
+            {
+                Console.WriteLine("There were {0} exceptions", e.InnerExceptions.Count);
+            }
         }
 
         private void CreateLogFile()
@@ -65,28 +72,15 @@ namespace LogTest
                     continue;
                 }
 
-                var linesWrittenToLog = new List<LogLine>();
+                var logLine = _lines.Take();
 
-                foreach (var logLine in _lines)
-                {
-                    if (_exit || !_quitWithFlush)
-                    {
-                        break;
-                    }
-
-                    WriteFormattedLineToLog(logLine);
-                    linesWrittenToLog.Add(logLine);
-                }
-
-                foreach (var line in linesWrittenToLog)
-                {
-                    _lines.Remove(line);
-                }
+                WriteFormattedLineToLog(logLine);
 
                 _exit = _quitWithFlush && _lines.Count == 0;
 
                 Thread.Sleep(50);
             }
+            _writer.Dispose();
         }
 
         private void WriteFormattedLineToLog(LogLine logLine)
@@ -125,9 +119,12 @@ namespace LogTest
 
         public void Write(string text)
         {
-            var logLine = new LogLine {Text = text, Timestamp = DateTimeProvider.Current.DateTimeNow};
+            Task.Run(() =>
+            {
+                var logLine = new LogLine {Text = text, Timestamp = DateTimeProvider.Current.DateTimeNow};
 
-            _lines.Add(logLine);
+                _lines.Add(logLine);
+            });
         }
     }
 }
