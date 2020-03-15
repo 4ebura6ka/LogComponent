@@ -1,4 +1,6 @@
-﻿namespace LogTest
+﻿using System.Globalization;
+
+namespace LogTest
 {
     using System;
     using System.Collections.Generic;
@@ -8,6 +10,8 @@
 
     public class AsyncLog : ILog
     {
+        private const string DefaultLogPath = @"C:\LogTest";
+
         private List<LogLine> _lines = new List<LogLine>();
 
         private StreamWriter _writer;
@@ -18,11 +22,11 @@
 
         private DateTime _lastLogFileCreationDateTime;
 
-        public AsyncLog()
+        public AsyncLog(string logPath = DefaultLogPath)
         {
-            if (!Directory.Exists(@"C:\LogTest"))
+            if (!Directory.Exists(logPath))
             {
-                Directory.CreateDirectory(@"C:\LogTest");
+                Directory.CreateDirectory(logPath);
             }
 
             CreateLogFile();
