@@ -12,7 +12,7 @@
 
         private List<LogLine> _lines = new List<LogLine>();
 
-        private StreamWriter _writer; 
+        private StreamWriter _writer;
 
         private bool _exit;
 
@@ -38,11 +38,18 @@
         {
             _lastLogFileCreationDateTime = DateTimeProvider.Current.DateTimeNow;
 
-            var logFileName = "Log" + DateTimeProvider.Current.DateTimeNow.ToString("yyyyMMdd HHmmss fff") + ".log";
+            var logTimeStamp = _lastLogFileCreationDateTime.ToString("yyyyMMdd HHmmss fff");
+            var logFileName = $"Log{logTimeStamp}.log";
             _writer = File.AppendText(@"C:\LogTest\" + logFileName);
 
-            var caption = "Timestamp".PadRight(25, ' ') + "\t" + "Data".PadRight(15, ' ') + "\t" + Environment.NewLine;
-            _writer.Write(caption);
+            var captionStringBuilder = new StringBuilder();
+            captionStringBuilder.Append("Timestamp".PadRight(25, ' '));
+            captionStringBuilder.Append("\t");
+            captionStringBuilder.Append("Data".PadRight(15, ' '));
+            captionStringBuilder.Append("\t");
+            captionStringBuilder.Append(Environment.NewLine);
+
+            _writer.Write(captionStringBuilder.ToString());
 
             _writer.AutoFlush = true;
         }
@@ -51,46 +58,57 @@
         {
             while (!_exit)
             {
-                if (_lines.Count > 0)
+                if (_lines.Count == 0)
                 {
-                    var _linesWrittenToLog = new List<LogLine>();
-
-                    foreach (var logLine in _lines)
-                    {
-                        if (!_exit || _quitWithFlush)
-                        {
-                            _linesWrittenToLog.Add(logLine);
-
-                            StringBuilder stringBuilder = new StringBuilder();
-
-                            if ((DateTimeProvider.Current.DateTimeNow - _lastLogFileCreationDateTime).Days != 0)
-                            {
-                                CreateLogFile();
-
-                                stringBuilder.Append(Environment.NewLine);
-                            }
-
-                            stringBuilder.Append(logLine.Timestamp.ToString("yyyy-MM-dd HH:mm:ss:fff"));
-                            stringBuilder.Append("\t");
-                            stringBuilder.Append(logLine.LineText());
-                            stringBuilder.Append("\t");
-
-                            stringBuilder.Append(Environment.NewLine);
-
-                            _writer.Write(stringBuilder.ToString());
-                        }
-                    }
-
-                    foreach (var line in _linesWrittenToLog)
-                    {
-                        _lines.Remove(line);   
-                    }
-
-                    _exit = _quitWithFlush && _lines.Count == 0;
-
-                    Thread.Sleep(50);
+                    continue;
                 }
+
+                var linesWrittenToLog = new List<LogLine>();
+
+                foreach (var logLine in _lines)
+                {
+                    if (_exit || !_quitWithFlush)
+                    {
+                        break;
+                    }
+
+                    WriteFormattedLineToLog(logLine);
+                    linesWrittenToLog.Add(logLine);
+                }
+
+                foreach (var line in linesWrittenToLog)
+                {
+                    _lines.Remove(line);
+                }
+
+                _exit = _quitWithFlush && _lines.Count == 0;
+
+                Thread.Sleep(50);
             }
+        }
+
+        private void WriteFormattedLineToLog(LogLine logLine)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+
+            var afterMidnight =
+                DateTimeProvider.Current.DateTimeNow.Day - _lastLogFileCreationDateTime.Day != 0;
+
+            if (afterMidnight)
+            {
+                CreateLogFile();
+
+                stringBuilder.Append(Environment.NewLine);
+            }
+
+            stringBuilder.Append(logLine.Timestamp.ToString("yyyy-MM-dd HH:mm:ss:fff"));
+            stringBuilder.Append("\t");
+            stringBuilder.Append(logLine.LineText());
+            stringBuilder.Append("\t");
+
+            stringBuilder.Append(Environment.NewLine);
+
+            _writer.Write(stringBuilder.ToString());
         }
 
         public void StopWithoutFlush()
@@ -105,7 +123,7 @@
 
         public void Write(string text)
         {
-            _lines.Add(new LogLine() { Text = text, Timestamp = DateTimeProvider.Current.DateTimeNow });
+            _lines.Add(new LogLine { Text = text, Timestamp = DateTimeProvider.Current.DateTimeNow });
         }
     }
 }
