@@ -13,8 +13,8 @@ namespace LogUsers
     class Program
     {
         static void Main(string[] args)
-        {
-            ILog  logger = new AsyncLog();
+        { 
+            ILog  logger = new AsyncLog(new LogStorageOperations());
 
             for (int i = 0; i < 15; i++)
             {
@@ -24,7 +24,7 @@ namespace LogUsers
 
             logger.StopWithFlush();
 
-            ILog logger2 = new AsyncLog();
+            ILog logger2 = new AsyncLog(new LogStorageOperations());
 
             for (int i = 50; i > 0; i--)
             {
