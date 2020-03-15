@@ -16,9 +16,9 @@
 
         private bool _exit;
 
-        private bool _quitWithFlush = false;
+        private bool _quitWithFlush;
 
-        private DateTime _curDate = DateTimeProvider.Current.DateTimeNow;
+        private DateTime _lastLogFileCreationDateTime;
 
         public AsyncLog()
         {
@@ -27,15 +27,24 @@
                 Directory.CreateDirectory(@"C:\LogTest");
             }
 
-            _writer = File.AppendText(@"C:\LogTest\Log" + DateTimeProvider.Current.DateTimeNow.ToString("yyyyMMdd HHmmss fff") + ".log");
-            
-            _writer.Write("Timestamp".PadRight(25, ' ') + "\t" + "Data".PadRight(15, ' ') + "\t" + Environment.NewLine);
-
-            _writer.AutoFlush = true;
+            CreateLogFile();
 
             _runThread = new Thread(MainLoop);
 
             _runThread.Start();
+        }
+
+        private void CreateLogFile()
+        {
+            _lastLogFileCreationDateTime = DateTimeProvider.Current.DateTimeNow;
+
+            var logFileName = "Log" + DateTimeProvider.Current.DateTimeNow.ToString("yyyyMMdd HHmmss fff") + ".log";
+            _writer = File.AppendText(@"C:\LogTest\" + logFileName);
+
+            var caption = "Timestamp".PadRight(25, ' ') + "\t" + "Data".PadRight(15, ' ') + "\t" + Environment.NewLine;
+            _writer.Write(caption);
+
+            _writer.AutoFlush = true;
         }
 
         private void MainLoop()
@@ -44,35 +53,21 @@
             {
                 if (_lines.Count > 0)
                 {
-                    int f = 0;
-                    List<LogLine> _handled = new List<LogLine>();
+                    var _linesWrittenToLog = new List<LogLine>();
 
-                    foreach (LogLine logLine in _lines)
+                    foreach (var logLine in _lines)
                     {
-                        f++;
-
-                        if (f > 5)
-                            continue;
-                        
                         if (!_exit || _quitWithFlush)
                         {
-                            _handled.Add(logLine);
+                            _linesWrittenToLog.Add(logLine);
 
                             StringBuilder stringBuilder = new StringBuilder();
 
-                            if ((DateTimeProvider.Current.DateTimeNow - _curDate).Days != 0)
+                            if ((DateTimeProvider.Current.DateTimeNow - _lastLogFileCreationDateTime).Days != 0)
                             {
-                                _curDate = DateTimeProvider.Current.DateTimeNow;
-
-                                _writer = File.AppendText(@"C:\LogTest\Log" + DateTimeProvider.Current.DateTimeNow.ToString("yyyyMMdd HHmmss fff") + ".log");
-
-                                _writer.Write("Timestamp".PadRight(25, ' ') + "\t" + "Data".PadRight(15, ' ') + "\t" + Environment.NewLine);
+                                CreateLogFile();
 
                                 stringBuilder.Append(Environment.NewLine);
-
-                                _writer.Write(stringBuilder.ToString());
-
-                                _writer.AutoFlush = true;
                             }
 
                             stringBuilder.Append(logLine.Timestamp.ToString("yyyy-MM-dd HH:mm:ss:fff"));
@@ -86,15 +81,12 @@
                         }
                     }
 
-                    for (int y = 0; y < _handled.Count; y++)
+                    foreach (var line in _linesWrittenToLog)
                     {
-                        _lines.Remove(_handled[y]);   
+                        _lines.Remove(line);   
                     }
 
-                    if (_quitWithFlush == true && _lines.Count == 0)
-                    {
-                        _exit = true;
-                    }
+                    _exit = _quitWithFlush && _lines.Count == 0;
 
                     Thread.Sleep(50);
                 }
