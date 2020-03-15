@@ -8,8 +8,6 @@
 
     public class AsyncLog : ILog
     {
-        private Thread _runThread;
-
         private List<LogLine> _lines = new List<LogLine>();
 
         private StreamWriter _writer;
@@ -29,7 +27,7 @@
 
             CreateLogFile();
 
-            _runThread = new Thread(MainLoop);
+            var _runThread = new Thread(MainLoop);
 
             _runThread.Start();
         }
@@ -103,7 +101,7 @@
 
             stringBuilder.Append(logLine.Timestamp.ToString("yyyy-MM-dd HH:mm:ss:fff"));
             stringBuilder.Append("\t");
-            stringBuilder.Append(logLine.LineText());
+            stringBuilder.Append(logLine.Text);
             stringBuilder.Append("\t");
 
             stringBuilder.Append(Environment.NewLine);
@@ -123,7 +121,9 @@
 
         public void Write(string text)
         {
-            _lines.Add(new LogLine { Text = text, Timestamp = DateTimeProvider.Current.DateTimeNow });
+            var logLine = new LogLine {Text = text, Timestamp = DateTimeProvider.Current.DateTimeNow};
+
+            _lines.Add(logLine);
         }
     }
 }

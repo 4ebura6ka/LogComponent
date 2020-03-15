@@ -5,14 +5,19 @@
 
     /// <summary>
     /// This is the object that the different loggers (FileLogger, ConsoleLogger etc.) will operate on. 
-    /// The LineText() method will be called to get the text (formatted) to log
+    /// The LineText() method will be called to get the _text (formatted) to log
     /// </summary>
     public class LogLine
     {
+        private string _text;
         /// <summary>
-        /// The text to be display in log line
+        /// The _text to be display in log line
         /// </summary>
-        public string Text { get; set; }
+        public string Text
+        {
+            get { return $"{_text}. "; }
+            set { _text = value; }
+        }
 
         /// <summary>
         /// The Timestamp is initialized when the log is added.
@@ -21,27 +26,6 @@
 
         public LogLine()
         {
-            Text = string.Empty;
-        }
-
-        public virtual string LineText()
-        {
-            StringBuilder sb = new StringBuilder();
-
-            if (Text.Length > 0)
-            {
-                sb.Append(Text);
-                sb.Append(". ");
-            }
-
-            sb.Append(CreateLineText());
-
-            return sb.ToString();
-        }
-
-        public virtual string CreateLineText()
-        {
-            return string.Empty;
         }
     }
 }
