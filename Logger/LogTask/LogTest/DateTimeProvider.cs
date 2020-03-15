@@ -1,36 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LogTest
+﻿namespace LogTest
 {
+    using System;
+
     public static class DateTimeProvider
     {
-        private static IDateTimeProvider current = new DefaultTimeProvider();
+        private static IDateTimeProvider _current = new DefaultTimeProvider();
 
         public static IDateTimeProvider Current
         {
-            get
-            {
-                return current;
-            }
-            set
-            {
-                current = value ?? throw new ArgumentNullException("value");
-            }
+            get => _current;
+            set => _current = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         private class DefaultTimeProvider : IDateTimeProvider
         {
-            public DateTime DateTimeNow
-            {
-                get
-                {
-                    return DateTime.Now;
-                }
-            }
+            public DateTime DateTimeNow => DateTime.Now;
         }
     }
 }
