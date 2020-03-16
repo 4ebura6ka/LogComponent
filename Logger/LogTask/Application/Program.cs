@@ -22,10 +22,10 @@ namespace LogUsers
 
             ILog logger2 = new AsyncLog(new LogStorageOperations());
 
-            for (int i = 100; i > 0; i--)
+            for (int i = 50; i > 0; i--)
             {
                 logger2.Write($"Number with No flush: {i}");
-                Thread.Sleep(20);
+                Thread.Sleep(30);
             }
 
             logger2.StopWithoutFlush();
