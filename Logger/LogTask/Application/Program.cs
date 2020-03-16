@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace LogUsers
+﻿namespace LogUsers
 {
     using System;
     using System.Threading;

@@ -1,7 +1,6 @@
 ﻿namespace LogTest
 {
     using System;
-    using System.Text;
 
     /// <summary>
     /// This is the object that the different loggers (FileLogger, ConsoleLogger etc.) will operate on. 
@@ -15,17 +14,13 @@
         /// </summary>
         public string Text
         {
-            get { return $"{_text}. "; }
-            set { _text = value; }
+            get => $"{_text}. "; 
+            set =>_text = value;
         }
 
         /// <summary>
         /// The Timestamp is initialized when the log is added.
         /// </summary>
         public virtual DateTime Timestamp { get; set; }
-
-        public LogLine()
-        {
-        }
     }
 }
