@@ -48,6 +48,8 @@
                 _logStorageOperations.WriteFormattedLineToLog(logLine);
 
                 _exit = _quitWithFlush && _lines.Count == 0;
+
+                Thread.Sleep(50);
             }
         }
 
