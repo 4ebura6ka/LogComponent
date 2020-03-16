@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace LogUsers
 {
+    using System;
     using System.Threading;
-
     using LogTest;
 
     class Program
@@ -18,8 +14,8 @@ namespace LogUsers
 
             for (int i = 0; i < 15; i++)
             {
-                logger.Write("Number with Flush: " + i.ToString());
-                Thread.Sleep(50);
+                logger.Write($"Number with Flush: {i}");
+                Thread.Sleep(10);
             }
 
             logger.StopWithFlush();
@@ -28,8 +24,8 @@ namespace LogUsers
 
             for (int i = 50; i > 0; i--)
             {
-                logger2.Write("Number with No flush: " + i.ToString());
-                Thread.Sleep(20);
+                logger2.Write($"Number with No flush: {i}");
+             //   Thread.Sleep(10);
             }
 
             logger2.StopWithoutFlush();

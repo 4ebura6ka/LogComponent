@@ -14,7 +14,9 @@
 
         private bool _quitWithFlush;
 
-        private LogStorageOperations _logStorageOperations;
+        private readonly LogStorageOperations _logStorageOperations;
+
+        private Task _mainLoopTask;
 
         public AsyncLog(LogStorageOperations logStorageOperations)
         {
@@ -24,7 +26,7 @@
 
             try
             {
-                Task.Run(() => MainLoop());
+                _mainLoopTask = Task.Run(() => MainLoop());
             }
             catch (AggregateException e)
             {
@@ -46,30 +48,26 @@
                 _logStorageOperations.WriteFormattedLineToLog(logLine);
 
                 _exit = _quitWithFlush && _lines.Count == 0;
-
-                Thread.Sleep(50);
             }
         }
-
 
         public void StopWithoutFlush()
         {
             _exit = true;
+            _mainLoopTask.Wait();
         }
 
         public void StopWithFlush()
         {
             _quitWithFlush = true;
+            _mainLoopTask.Wait();
         }
 
         public void Write(string text)
         {
-            Task.Run(() =>
-            {
-                var logLine = new LogLine {Text = text, Timestamp = DateTimeProvider.Current.DateTimeNow};
+            var logLine = new LogLine {Text = text, Timestamp = DateTimeProvider.Current.DateTimeNow};
 
-                _lines.Add(logLine);
-            });
+            _lines.Add(logLine);
         }
     }
 }

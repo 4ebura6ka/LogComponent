@@ -37,7 +37,6 @@
 
             var log = new AsyncLog(new LogStorageOperations());
             log.Write(_demoText);
-            Thread.Sleep(50);
             log.StopWithFlush();
 
             Assert.True(Directory.Exists(LogDir));
@@ -99,8 +98,10 @@
             for (var i = 0; i <= loopCounter; i++)
             {
                 log.Write($"{_demoText}{i}");
-                Thread.Sleep(40);
             }
+
+            await Task.Delay(1);
+
             log.StopWithoutFlush();
 
             Assert.True(Directory.Exists(LogDir));
@@ -136,7 +137,6 @@
             for (var i = 0; i <= loopCounter; i++)
             {
                 log.Write($"{_demoText}{i}");
-                Thread.Sleep(40);
             }
             log.StopWithFlush();
 
