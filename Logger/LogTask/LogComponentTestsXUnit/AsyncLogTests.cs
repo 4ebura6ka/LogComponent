@@ -117,7 +117,7 @@
                     using (var streamReader = File.OpenText(file))
                     {
                         var content = await streamReader.ReadToEndAsync();
-                        Assert.False(_demoText.Contains($"{_demoText}{loopCounter}"));
+                        Assert.False(content.Contains($"{_demoText}{loopCounter}"));
                     }
                     break;
                 }
