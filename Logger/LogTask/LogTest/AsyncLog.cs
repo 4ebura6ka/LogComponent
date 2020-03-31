@@ -5,7 +5,6 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-
     public class AsyncLog : ILog
     {
         private BlockingCollection<LogLine> _lines = new BlockingCollection<LogLine>();
@@ -34,40 +33,36 @@
             }
         }
 
-        private void MainLoop()
+        private async void MainLoop()
         {
-            while (!_exit)
+            try
             {
-                if (_lines.Count == 0)
+                foreach (var logLine in _lines.GetConsumingEnumerable())
                 {
-                    continue;
+                    _logStorageOperations.WriteFormattedLineToLog(logLine);
+
+                    await Task.Delay(10);
                 }
-
-                var logLine = _lines.Take();
-
-                _logStorageOperations.WriteFormattedLineToLog(logLine);
-
-                _exit = _quitWithFlush && _lines.Count == 0;
-
-                Thread.Sleep(50);
+            }
+            catch (ObjectDisposedException ex)
+            {
+                Console.WriteLine("Collection was disposed");
             }
         }
 
         public void StopWithoutFlush()
         {
-            _exit = true;
-            _mainLoopTask.Wait();
+            _lines.Dispose();
         }
 
         public void StopWithFlush()
         {
-            _quitWithFlush = true;
-            _mainLoopTask.Wait();
+            _lines.CompleteAdding();
         }
 
         public void Write(string text)
         {
-            var logLine = new LogLine {Text = text, Timestamp = DateTimeProvider.Current.DateTimeNow};
+            var logLine = new LogLine { Text = text, Timestamp = DateTimeProvider.Current.DateTimeNow };
 
             _lines.Add(logLine);
         }
