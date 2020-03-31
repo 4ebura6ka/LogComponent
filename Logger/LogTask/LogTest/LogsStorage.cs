@@ -4,37 +4,36 @@
     using System.IO;
     using System.Text;
 
-    public class LogStorageOperations
+    public class LogsStorage
     {
-        private const string DefaultLogPath = @"C:\LogTest";
+        private const string DefaultLogDirPath = @"C:\LogTest";
 
-        private readonly string _logPath;
+        private readonly string _logDirPath;
 
-        private string _logFullPath;
+        private string _currentLogFileFullPath;
 
         private DateTime _lastLogFileCreationDateTime;
 
-        public LogStorageOperations(string logPath = DefaultLogPath)
+        public LogsStorage(string logDirPath = DefaultLogDirPath)
         {
-
-            if (!Directory.Exists(logPath))
+            if (!Directory.Exists(logDirPath))
             {
-                Directory.CreateDirectory(logPath);
+                Directory.CreateDirectory(logDirPath);
             }
 
-            _logPath = logPath;
-
+            _logDirPath = logDirPath;
         }
 
-        public void CreateLogFile()
+        public void CreateNewLogFile()
         {
             _lastLogFileCreationDateTime = DateTimeProvider.Current.DateTimeNow;
 
             var logTimeStamp = _lastLogFileCreationDateTime.ToString("yyyyMMdd HHmmss fff");
             var logFileName = $"Log{logTimeStamp}.log";
-            _logFullPath = Path.Combine(_logPath, logFileName);
 
-            using (var writer = File.AppendText(_logFullPath))
+            _currentLogFileFullPath = Path.Combine(_logDirPath, logFileName);
+
+            using (var writer = File.AppendText(_currentLogFileFullPath))
             {
                 var captionStringBuilder = new StringBuilder();
                 captionStringBuilder.Append("Timestamp".PadRight(25, ' '));
@@ -51,27 +50,25 @@
 
         public void WriteFormattedLineToLog(LogLine logLine)
         {
-            StringBuilder stringBuilder = new StringBuilder();
 
             var afterMidnight =
                 DateTimeProvider.Current.DateTimeNow.Day - _lastLogFileCreationDateTime.Day != 0;
 
             if (afterMidnight)
             {
-                CreateLogFile();
-
-                stringBuilder.Append(Environment.NewLine);
+                CreateNewLogFile();
             }
 
-            stringBuilder.Append(logLine.Timestamp.ToString("yyyy-MM-dd HH:mm:ss:fff"));
-            stringBuilder.Append("\t");
-            stringBuilder.Append(logLine.Text);
-            stringBuilder.Append("\t");
-
-            stringBuilder.Append(Environment.NewLine);
-
-            using (var writer = File.AppendText(_logFullPath))
+            using (var writer = File.AppendText(_currentLogFileFullPath))
             {
+                var stringBuilder = new StringBuilder();
+
+                stringBuilder.Append(logLine.Timestamp.ToString("yyyy-MM-dd HH:mm:ss:fff"));
+                stringBuilder.Append("\t");
+                stringBuilder.Append(logLine.Text);
+                stringBuilder.Append("\t");
+                stringBuilder.Append(Environment.NewLine);
+
                 writer.Write(stringBuilder.ToString());
             }
         }

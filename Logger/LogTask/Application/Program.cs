@@ -9,7 +9,7 @@ namespace LogUsers
     {
         static void Main(string[] args)
         { 
-            ILog  logger = new AsyncLog(new LogStorageOperations());
+            ILog  logger = new AsyncLog(new LogsStorage());
             for (int i = 0; i < 15; i++)
             {
                 logger.Write($"Number with Flush: {i}");
@@ -17,7 +17,7 @@ namespace LogUsers
             }
             logger.StopWithFlush();
 
-            ILog logger2 = new AsyncLog(new LogStorageOperations());
+            ILog logger2 = new AsyncLog(new LogsStorage());
             for (int i = 50; i > 0; i--)
             {
                 logger2.Write($"Number with No flush: {i}");

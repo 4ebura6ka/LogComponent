@@ -35,7 +35,7 @@
             dateProviderMock.SetupGet(x => x.DateTimeNow).Returns(dateTime);
             DateTimeProvider.Current = dateProviderMock.Object;
 
-            var log = new AsyncLog(new LogStorageOperations());
+            var log = new AsyncLog(new LogsStorage());
             log.Write(_demoText);
             log.StopWithFlush();
 
@@ -66,7 +66,7 @@
             timeMock.SetupGet(x => x.DateTimeNow).Returns(new DateTime(2020, 3, 12, 11, 59, 00));
             DateTimeProvider.Current = timeMock.Object;
 
-            var log = new AsyncLog(new LogStorageOperations());
+            var log = new AsyncLog(new LogsStorage());
             log.Write(_demoText);
             Thread.Sleep(50);
 
@@ -92,7 +92,7 @@
             dateTimeProviderMock.SetupGet(x => x.DateTimeNow).Returns(dateTime);
             DateTimeProvider.Current = dateTimeProviderMock.Object;
 
-            var log = new AsyncLog(new LogStorageOperations());
+            var log = new AsyncLog(new LogsStorage());
             log.Write(_demoText);
             var loopCounter = 5;
             for (var i = 0; i <= loopCounter; i++)
@@ -132,7 +132,7 @@
             dateTimeProviderMock.SetupGet(x => x.DateTimeNow).Returns(dateTime);
             DateTimeProvider.Current = dateTimeProviderMock.Object;
 
-            var log = new AsyncLog(new LogStorageOperations());
+            var log = new AsyncLog(new LogsStorage());
             var loopCounter = 5;
             for (var i = 0; i <= loopCounter; i++)
             {

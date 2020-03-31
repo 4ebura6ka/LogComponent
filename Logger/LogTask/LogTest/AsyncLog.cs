@@ -13,19 +13,17 @@
 
         private bool _quitWithFlush;
 
-        private readonly LogStorageOperations _logStorageOperations;
+        private readonly LogsStorage _logsStorage;
 
-        private Task _mainLoopTask;
-
-        public AsyncLog(LogStorageOperations logStorageOperations)
+        public AsyncLog(LogsStorage logsStorage)
         {
-            _logStorageOperations = logStorageOperations;
+            _logsStorage = logsStorage;
 
-            _logStorageOperations.CreateLogFile();
+            _logsStorage.CreateNewLogFile();
 
             try
             {
-                _mainLoopTask = Task.Run(() => MainLoop());
+               var _mainLoopTask = Task.Run(() => MainLoop());
             }
             catch (AggregateException e)
             {
@@ -39,7 +37,7 @@
             {
                 foreach (var logLine in _lines.GetConsumingEnumerable())
                 {
-                    _logStorageOperations.WriteFormattedLineToLog(logLine);
+                    _logsStorage.WriteFormattedLineToLog(logLine);
 
                     await Task.Delay(10);
                 }
