@@ -43,9 +43,9 @@
                 captionStringBuilder.Append("\t");
                 captionStringBuilder.Append(Environment.NewLine);
 
-                writer.Write(captionStringBuilder.ToString());
-
                 writer.AutoFlush = true;
+
+                writer.Write(captionStringBuilder.ToString());
             }
         }
 
