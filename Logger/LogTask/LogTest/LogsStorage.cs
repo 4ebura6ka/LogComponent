@@ -36,7 +36,7 @@
             using (var writer = File.AppendText(_currentLogFileFullPath))
             {
                 var captionStringBuilder = new StringBuilder();
-                captionStringBuilder.Append("Timestamp".PadRight(25, ' '));
+                captionStringBuilder.Append("LineTimestamp".PadRight(25, ' '));
                 captionStringBuilder.Append("\t");
                 captionStringBuilder.Append("Data".PadRight(15, ' '));
                 captionStringBuilder.Append("\t");
@@ -63,9 +63,9 @@
             {
                 var stringBuilder = new StringBuilder();
 
-                stringBuilder.Append(logLine.Timestamp.ToString("yyyy-MM-dd HH:mm:ss:fff"));
+                stringBuilder.Append(logLine.LineTimestamp.ToString("yyyy-MM-dd HH:mm:ss:fff"));
                 stringBuilder.Append("\t");
-                stringBuilder.Append(logLine.Text);
+                stringBuilder.Append(logLine.DisplayedText);
                 stringBuilder.Append("\t");
                 stringBuilder.Append(Environment.NewLine);
 
